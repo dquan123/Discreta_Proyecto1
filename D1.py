@@ -92,7 +92,13 @@ def tabla_verdad(expr):
 # Entrada: expresión.
 # Salida: booleano.
 def tautologia(expr):
-    pass
+    tabla = tabla_verdad(expr)
+    
+    # El último valor de cada fila es el resultado de la expresión
+    for fila in tabla:
+        if not fila[-1]:
+            return False
+    return True
 
 # Función: equivalentes
 # Esta función determina si expr1 es equivalente a expr2, devuelve True;
