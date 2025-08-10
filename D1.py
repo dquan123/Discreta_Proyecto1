@@ -1,6 +1,6 @@
 """
 # MM2015 - Desafío de programación 1: Lógica proposicional
-# autor: macastillo
+# Autores: Diego Quan, Joel Nerio, Miguel Rosas, Arodi Chávez
 
 # NOTA:
 # Debe utilizar letras minúsculas para los nombres de las variables, por ejemplo, a, b, c.
@@ -50,6 +50,19 @@ def extract_variables(expression):
 
 # ********************** FIN *******************************
 
+# Función que crea las combinaciones para todas las variables de la tabla de verdad
+def generar_combinaciones(n):
+    combinaciones = []
+    total = 2 ** n
+    for i in range(total):
+        fila = []
+        for bit in range(n):
+            # Bit más significativo primero
+            valor = bool((i >> (n - bit - 1)) & 1)
+            fila.append(valor)
+        combinaciones.append(fila)
+    return combinaciones
+
 
 
 ############## IMPLEMENTAR LAS SIGUIENTES FUNCIONES  ##############
@@ -61,7 +74,17 @@ def extract_variables(expression):
 # Salida: tabla de verdad como una lista de listas.
 
 def tabla_verdad(expr):
-    pass
+    vars = extract_variables(expr)
+    n = len(vars)
+    table = []
+    for combo in generar_combinaciones(n):
+        contexto = {var: val for var, val in zip(vars, combo)}
+        try:
+            resultado = eval(expr, {}, contexto)
+        except Exception as e:
+            raise ValueError(f"Error al evaluar la expresión: {e}")
+        table.append(combo + [resultado])
+    return table
 
 # Función: tautologia
 # Esta función determina si la expresión es una tautología, devuelve True;
@@ -86,3 +109,63 @@ def equivalentes(expr1, expr2):
 
 def inferencia(expr):
     pass
+
+
+
+##Función que contiene el menú de opciones
+def menu():
+    while True:
+        print("\n--- MENÚ PRINCIPAL ---")
+        print("1. Tabla de verdad")
+        print("2. Verificar tautología")
+        print("3. Verificar equivalencias")
+        print("4. Realizar inferencia")
+        print("5. Finalizar")
+
+        opcion = input("Seleccione una opción (1-5): ").strip()
+
+        if opcion == "1":
+            expr = input("Ingrese la proposición: ").strip()
+            try:
+                tabla = tabla_verdad(expr)
+                print("\nTabla de verdad:")
+                for fila in tabla:
+                    print(fila)
+            except Exception as e:
+                print("Error:", e)
+
+        elif opcion == "2":
+            expr = input("Ingrese la proposición: ").strip()
+            try:
+                print("Es tautología?:", tautologia(expr))
+            except Exception as e:
+                print("Error:", e)
+
+        elif opcion == "3":
+            expr1 = input("Ingrese la primera proposición: ").strip()
+            expr2 = input("Ingrese la segunda proposición: ").strip()
+            try:
+                print("Son equivalentes?:", equivalentes(expr1, expr2))
+            except Exception as e:
+                print("Error:", e)
+
+        elif opcion == "4":
+            expr = input("Ingrese la proposición con formato 'expr = 0/1': ").strip()
+            try:
+                resultados = inferencia(expr)
+                print("Asignaciones que cumplen la condición:")
+                for fila in resultados:
+                    print(fila)
+            except Exception as e:
+                print("Error:", e)
+
+        elif opcion == "5":
+            print("Programa finalizado.")
+            break
+
+        else:
+            print("Opción no válida. Intente nuevamente.")
+
+
+if __name__ == "__main__":
+    menu()
