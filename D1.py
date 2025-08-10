@@ -80,7 +80,7 @@ def tabla_verdad(expr):
     for combo in generar_combinaciones(n):
         contexto = {var: val for var, val in zip(vars, combo)}
         try:
-            resultado = eval(expr, {}, contexto)
+            resultado = eval(expr, {"implies": implies, "iff": iff}, contexto)
         except Exception as e:
             raise ValueError(f"Error al evaluar la expresión: {e}")
         table.append(combo + [resultado])
