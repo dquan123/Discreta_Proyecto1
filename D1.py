@@ -22,6 +22,7 @@ import re
 
 
 class Infix(object):
+    """Soporte de operadores infijos para implies e iff."""
     def __init__(self, func):
         self.func = func
     def __or__(self, other):
@@ -32,11 +33,13 @@ class Infix(object):
         return self.func(v1, v2)
 
 @Infix
-def implies(p, q) :
+def implies(p, q):
+    """Implica: p → q es equivalente a (¬p) ∨ q."""
     return not p or q
 
 @Infix
-def iff(p, q) :
+def iff(p, q):
+    """Doble implicación: p ↔ q es (p → q) ∧ (q → p)."""
     return (p |implies| q) and (q |implies| p)
 
 # Debe utilizar esta función para extraer variables.
@@ -52,6 +55,20 @@ def extract_variables(expression):
 
 # Función que crea las combinaciones para todas las variables de la tabla de verdad
 def generar_combinaciones(n):
+    """
+        Genera todas las combinaciones booleanas para n variables en orden binario convencional.
+
+        Parámetros
+        ————
+        n: int
+            Cantidad de variables proposicionales.
+
+        Retorna
+        ————
+        list[list[bool]]
+            Lista de filas, donde cada fila es una asignación [v1, v2, ..., vn] con valores True/False.
+            El orden es MSB primero: 00...0, 00...1, ..., 11...1.
+    """
     combinaciones = []
     total = 2 ** n
     for i in range(total):
@@ -69,11 +86,27 @@ def generar_combinaciones(n):
 ############## No modificar las definiciones de las funciones ##############
 
 # Función: tabla_verdad
-# Esta función calcula una tabla de verdad para una expresión dada.
-# Entrada: expresión.
-# Salida: tabla de verdad como una lista de listas.
-
 def tabla_verdad(expr):
+    """
+        Genera la tabla de verdad de una expresión proposicional.
+
+        Parámetros
+        ----------
+        expr : str
+            Expresión en términos de variables a–z y operadores (not, and, or, |implies|, |iff|).
+
+        Retorna
+        -------
+        list[list[bool]]
+            Si hay n variables, cada fila tiene n + 1 elementos:
+            los n primeros son la asignación a las variables (en orden ascendente),
+            y el último es el valor de la fórmula bajo dicha asignación.
+
+        Lanza
+        -----
+        ValueError
+            Si la expresión no se puede evaluar (p. ej., sintaxis inválida o variable no permitida).
+    """
     vars = extract_variables(expr)
     n = len(vars)
     table = []
@@ -87,11 +120,25 @@ def tabla_verdad(expr):
     return table
 
 # Función: tautologia
-# Esta función determina si la expresión es una tautología, devuelve True;
-# en caso contrario, devuelve False.
-# Entrada: expresión.
-# Salida: booleano.
 def tautologia(expr):
+    """
+        Determina si una expresión es tautología (siempre verdadera).
+
+        Parámetros
+        ----------
+        expr : str
+            Expresión proposicional.
+
+        Retorna
+        -------
+        bool
+            True si todas las valuaciones producen True; False en caso contrario.
+
+        Lanza
+        -----
+        ValueError
+            Si la expresión no se puede evaluar.
+    """
     tabla = tabla_verdad(expr)
     
     # El último valor de cada fila es el resultado de la expresión
@@ -101,11 +148,29 @@ def tautologia(expr):
     return True
 
 # Función: equivalentes
-# Esta función determina si expr1 es equivalente a expr2, devuelve True;
-# en caso contrario, devuelve False.
-# Entrada: expresión 1 y expresión 2.
-# Salida: booleano.
 def equivalentes(expr1, expr2):
+    """
+        Verifica equivalencia lógica entre dos expresiones.
+
+        Parámetros
+        ----------
+        expr1 : str
+            Primera expresión.
+        expr2 : str
+            Segunda expresión.
+
+        Retorna
+        -------
+        bool
+            True si ambas expresiones tienen el mismo valor para todas las asignaciones
+            de sus variables; False en caso contrario. Si las variables no coinciden exactamente,
+            retorna False.
+
+        Lanza
+        -----
+        ValueError
+            Si alguna expresión no se puede evaluar.
+    """
     # Extraer y comparar conjuntos de variables
     vars1 = extract_variables(expr1)
     vars2 = extract_variables(expr2)
@@ -125,14 +190,33 @@ def equivalentes(expr1, expr2):
             return False
     return True
 
-# Función: inferencia
-# Esta función determina los valores de verdad para una valuación de una proposición dada.
-# Entrada: expresión.
-# Salida: lista de listas.
+
 
 
 #función de inferencia.
 def inferencia(expr):
+    """
+        Obtiene las asignaciones que satisfacen una igualdad de verdad.
+
+        Formato de entrada: "<proposición> = <0|1>"
+
+        Parámetros
+        ----------
+        expr : str
+            Proposición seguida de '=', y al final 0 (falso) o 1 (verdadero).
+
+        Retorna
+        -------
+        list[list[bool]]
+            Lista de asignaciones (cada una con n valores True/False) que cumplen la igualdad.
+            Si ninguna la cumple, retorna [].
+
+        Lanza
+        -----
+        ValueError
+            Si no hay exactamente un '=', si el valor esperado no es 0/1,
+            o si la expresión es inválida.
+    """
     # Verificar formato
     if "=" not in expr:
         raise ValueError("La proposición debe contener '=' seguido de 0 o 1.")
@@ -167,8 +251,11 @@ def inferencia(expr):
     
 
 
-##Función que contiene el menú de opciones
+
 def menu():
+    """
+       Despliega el menú principal y coordina las operaciones interactivas del programa.
+    """
     while True:
         print("\n--- MENÚ PRINCIPAL ---")
         print("1. Tabla de verdad")
