@@ -130,9 +130,41 @@ def equivalentes(expr1, expr2):
 # Entrada: expresión.
 # Salida: lista de listas.
 
-def inferencia(expr):
-    pass
 
+#función de inferencia.
+def inferencia(expr):
+    # Verificar formato
+    if "=" not in expr:
+        raise ValueError("La proposición debe contener '=' seguido de 0 o 1.")
+    izquierda, derecha = expr.split("=")
+    izquierda = izquierda.strip()
+    derecha = derecha.strip()
+
+    # Validar valor esperado
+    if derecha not in ("0", "1"):
+        raise ValueError("El valor a la derecha de '=' debe ser 0 o 1.")
+
+    valor_esperado = True if derecha == "1" else False
+
+    # Obtener variables de la parte izquierda
+    vars = extract_variables(izquierda)
+    n = len(vars)
+    resultados = []
+
+    # Probar todas las combinaciones posibles
+    for combo in generar_combinaciones(n):
+        contexto = {var: val for var, val in zip(vars, combo)}
+        try:
+            resultado = bool(eval(izquierda, {"implies": implies, "iff": iff}, contexto))
+        except Exception as e:
+            raise ValueError(f"Error al evaluar la expresión: {e}")
+
+        # Guardar las que cumplen la igualdad
+        if resultado == valor_esperado:
+            resultados.append(combo)
+
+    return resultados
+    
 
 
 ##Función que contiene el menú de opciones
